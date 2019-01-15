@@ -17,9 +17,8 @@ class Board
 
   def initialize(mode)
     @mines = num_mines(mode)
-    @size = board_size(mode)
-    p @mines
-    p @size
+    @rows, @cols = board_size(mode)
+    @board = empty_board
   end
 
   def num_mines(mode)
@@ -29,8 +28,37 @@ class Board
   def board_size(mode)
     MODES[mode][:size]
   end
+
+  def empty_board
+    arr = []
+    @rows.times { arr << Array.new(@cols) }
+    arr
+  end
+
+  def print_row_header
+    puts "  #{(0...@rows).to_a.join(' ')}"
+  end
+
+  def row_to_string(row)
+    row.map do |tile|
+      tile.nil? || !tile.revealed ? '*' : tile.value
+    end
+  end
+
+  def print_rows
+    @board.each_with_index do |row, idx|
+      print "#{idx} "
+      puts row_to_string(row).join(' ')
+    end
+  end
+
+  def render
+    print_row_header
+    print_rows
+  end
 end
 
 if $PROGRAM_NAME == __FILE__
   board = Board.new(:easy)
+  board.render
 end
