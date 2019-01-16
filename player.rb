@@ -43,7 +43,7 @@ class Player
 
   def valid_input?(string)
     action, rest = parse_input(string)
-    return false if [action, rest].any?(&:nil?)
+    return false if [action, rest].any?(&:nil?) || action[0].empty?
     x, y = parse_coords(rest)
     return true if @rows_range.include?(x) && @cols_range.include?(y) && 
                    ACTIONS.include?(action[0])
@@ -52,6 +52,6 @@ class Player
 end
 
 if $PROGRAM_NAME == __FILE__
-  player = Player.new(9, 9)
+  player = Player.new([9, 9])
   p player.get_input
 end
