@@ -162,13 +162,8 @@ class Board
 
     searched << coords
     tile = get_tile(coords)
-
-    if empty_tile?(tile)
-      tile.reveal
-      reveal_more(coords, searched)
-    elsif !mine?(tile)
-      tile.reveal
-    end
+    tile.reveal
+    reveal_more(coords, searched) if empty_tile?(tile)
   end
 
   def reveal_more(coords, searched)
