@@ -3,21 +3,6 @@
 require './tile.rb'
 
 class Board
-  MODES = {
-    easy: {
-      mines: 10,
-      size: [9, 9]
-    },
-    medium: {
-      mines: 40,
-      size: [16, 16]
-    },
-    hard: {
-      mines: 99,
-      size: [16, 30]
-    }
-  }.freeze
-
   SPACES = {
     empty: '_',
     unclicked: '*',
@@ -29,9 +14,9 @@ class Board
 
   attr_reader :board
 
-  def initialize(mode)
-    @mines = num_mines(mode)
-    @rows, @cols = board_size(mode)
+  def initialize(mines, size_arr)
+    @mines = mines
+    @rows, @cols = size_arr
     @board = empty_board
   end
 
@@ -74,14 +59,6 @@ class Board
   end
 
   private
-
-  def num_mines(mode)
-    MODES[mode][:mines]
-  end
-
-  def board_size(mode)
-    MODES[mode][:size]
-  end
 
   def empty_board
     arr = []
