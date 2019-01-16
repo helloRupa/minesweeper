@@ -3,7 +3,8 @@
 class Player
   ACTIONS = 'fr'
 
-  def initialize(rows, cols)
+  def initialize(board_size)
+    rows, cols = board_size
     @rows_range = (0...rows).to_a
     @cols_range = (0...cols).to_a
   end
