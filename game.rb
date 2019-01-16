@@ -21,7 +21,8 @@ class Game
   def initialize
     welcome_message
     mode = get_mode
-    @board = Board.new(num_mines(mode), board_size(mode))
+    @mines = num_mines(mode)
+    @board = Board.new(@mines, board_size(mode))
   end
 
   def welcome_message
@@ -38,13 +39,18 @@ class Game
   end
 
   def get_mode
-    puts 'Please choose a difficulty: easy, medium or hard:'
+    mode_msg
     mode = gets.chomp.downcase
     until MODES.key?(mode)
-      puts 'Please choose a difficulty: easy, medium or hard:'
+      mode_msg
       mode = gets.chomp.downcase
     end
     mode
+  end
+
+  def mode_msg
+    puts 'Please choose a difficulty: easy, medium or hard:'
+    print '> '
   end
 
   def num_mines(mode)
@@ -54,8 +60,16 @@ class Game
   def board_size(mode)
     MODES[mode][:size]
   end
+
+  def render
+    puts "Mines: #{@mines - @board.flag_count}"
+    puts
+    @board.render
+    puts
+  end
 end
 
 if $PROGRAM_NAME == __FILE__
   game = Game.new
+  game.render
 end
