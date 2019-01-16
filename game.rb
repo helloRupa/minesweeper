@@ -72,8 +72,7 @@ class Game
   end
 
   def set_game_over(coords)
-    y, x = coords
-    tile = @board.get_tile(y, x)
+    tile = @board.get_tile(coords)
     @game_over = @board.mine?(tile)
   end
 
