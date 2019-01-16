@@ -24,8 +24,8 @@ class Game
   def self.minesweeper
     self.welcome_message
     game = self.saved_game? ? self.load_game(self.get_filename) : new
-    exit_code = game.run
-    exit(true) unless exit_code
+    should_save = game.run
+    exit(true) unless should_save
     game.save_game
     puts 'Goodbye.'
   end
@@ -45,7 +45,6 @@ class Game
   end
 
   def initialize
-    # welcome_message
     @is_first = true
     @game_over = false
     mode = get_mode
