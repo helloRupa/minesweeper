@@ -1,4 +1,5 @@
 # Play Minesweeper in the Terminal / CLI
+require 'yaml'
 require_relative './player.rb'
 require_relative './board.rb'
 
@@ -18,8 +19,24 @@ class Game
     }
   }.freeze
 
+  private_class_method :new
+
+  def self.minesweeper
+    game = new
+    exit_code = game.run
+    exit(true) unless exit_code
+    game.save_game
+    puts 'Goodbye.'
+  end
+
+  def self.load_game(filename)
+    game = YAML.load(File.read(filename))
+    game.run
+  end
+
   def initialize
     welcome_message
+    @is_first = true
     @game_over = false
     mode = get_mode
     @mines = num_mines(mode)
@@ -33,11 +50,11 @@ class Game
     puts
     puts "The goal is to reveal all spaces that aren't mines. If you select a mine, it's game over!"
     puts
-    puts "To play, choose an action: reveal (r) or flag (f) followed by the coordinates for a space (e.g. r0,0)." 
+    puts 'To play, choose an action: reveal (r) or flag (f) followed by the coordinates for a space (e.g. r0,0).'
     puts "Reveal shows the space's value, while flag places a flag on it, meaning you think there's a mine."
     puts "You can't reveal a space that's flagged. You must unflag it first using the flag action."
     puts
-    puts "Good luck! Bonne chance!"
+    puts 'Good luck! Bonne chance!'
     puts
   end
 
@@ -85,17 +102,25 @@ class Game
     print '> '
   end
 
-  def turn(is_first)
+  def turn
     render
     turn_msg
-    action, coords = @player.get_input
-    @board.populate(coords) if is_first
-    if action == 'r'
-      @board.reveal(coords)
-      set_game_over(coords) unless flagged?(coords)
+    input = @player.get_input
+
+    if input == 'quit'
+      return true
     else
-      @board.flag(coords)
+      puts @is_first
+      action, coords = input
+      @board.populate(coords) if @is_first
+      if action == 'r'
+        @board.reveal(coords)
+        set_game_over(coords) unless flagged?(coords)
+      else
+        @board.flag(coords)
+      end
     end
+    false
   end
 
   def flagged?(coords)
@@ -111,16 +136,56 @@ class Game
   end
 
   def run
-    turn(true)
-    turn(false) until @game_over || game_won?
+    exit_code = turn
+    @is_first = false
+    exit_code = turn until @game_over || game_won? || exit_code
+    return true if exit_code
     render
     @game_over ? game_over_msg : win_msg
+    false
+  end
+
+  def save_msg
+    puts 'Would you like to save your game? (Y/N)'
+    print '> '
+  end
+
+  def get_save_answer
+    save_msg
+    input = gets.chomp.downcase
+    until 'yn'.include?(input) && !input.empty?
+      save_msg
+      input = gets.chomp.downcase
+    end
+    input
+  end
+
+  def filename_msg
+    puts 'Please enter a filename:'
+    print '> '
+  end
+
+  def get_filename
+    filename_msg
+    filename = gets.chomp
+    while filename.empty?
+      filename_msg
+      filename = gets.chomp
+    end
+    filename
+  end
+
+  def save_game
+    input = get_save_answer
+    if input == 'y'
+      filename = get_filename
+      File.open("#{filename}.yml", "w") { |file| file.write(self.to_yaml) }
+      puts 'File saved.'
+    end
   end
 end
 
 if $PROGRAM_NAME == __FILE__
-  game = Game.new
-  game.run
-  # game.render
-  # game.game_over?([0,0])
+  Game.minesweeper
+  # Game.load_game('testing.yml')
 end
