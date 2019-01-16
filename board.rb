@@ -58,6 +58,17 @@ class Board
     tile.value == SPACES[:mine]
   end
 
+  def flag_count
+    count = 0
+    @board.each do |row|
+      row.each do |tile|
+        next if tile.nil?
+        count += 1 if tile.flagged
+      end
+    end
+    count
+  end
+
   private
 
   def empty_board
@@ -138,11 +149,12 @@ class Board
 end
 
 if $PROGRAM_NAME == __FILE__
-  board = Board.new(:easy)
+  board = Board.new(10, [9,9])
   board.populate([1, 1])
   board.render
   board.reveal([0, 0])
   board.flag([0,1])
+  p "Flags = #{board.flag_count}"
   board.render
   p board.complete?
   board.board.each do |row|
@@ -154,6 +166,7 @@ if $PROGRAM_NAME == __FILE__
   board.render
   p board.complete?
   board.flag([0, 1])
+  p "Flags = #{board.flag_count}"
   board.reveal([0,1])
   board.render
   p board.complete?
