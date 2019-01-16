@@ -26,8 +26,7 @@ class Board
   end
 
   def reveal(coords)
-    y, x = coords
-    @board[y][x].reveal
+    cascade(coords)
   end
 
   def flag(coords)
@@ -50,7 +49,8 @@ class Board
     print_rows
   end
 
-  def get_tile(y, x)
+  def get_tile(coords)
+    y, x = coords
     @board[y][x]
   end
 
@@ -111,7 +111,8 @@ class Board
     end
   end
 
-  def on_board?(y, x)
+  def on_board?(coords)
+    y, x = coords
     (0...@rows).cover?(y) && (0...@cols).cover?(x)
   end
 
@@ -119,8 +120,8 @@ class Board
     y, x = coords
     mine_count = 0
     SEARCH_AREA.each do |s_y, s_x|
-      next unless on_board?(y + s_y, x + s_x)
-      tile = get_tile(y + s_y, x + s_x)
+      next unless on_board?([y + s_y, x + s_x])
+      tile = get_tile([y + s_y, x + s_x])
       next if tile.nil?
       mine_count += 1 if mine?(tile)
     end
@@ -146,28 +147,35 @@ class Board
       end
     end
   end
+
+  def empty_tile?(tile)
+    tile.value == SPACES[:empty]
+  end
+
+  def cascade(coords, searched = [])
+    return if searched.include?(coords) || !on_board?(coords)
+
+    searched << coords
+    tile = get_tile(coords)
+
+    if empty_tile?(tile)
+      tile.reveal
+      reveal_more(coords, searched)
+    elsif !mine?(tile)
+      tile.reveal
+    end
+  end
+
+  def reveal_more(coords, searched)
+    y, x = coords
+    SEARCH_AREA.each { |s_y, s_x| cascade([y + s_y, x + s_x], searched) }
+  end
 end
 
 if $PROGRAM_NAME == __FILE__
   board = Board.new(10, [9,9])
-  board.populate([1, 1])
   board.render
-  board.reveal([0, 0])
-  board.flag([0,1])
-  p "Flags = #{board.flag_count}"
+  board.populate([3, 3])
+  board.reveal([3, 3])
   board.render
-  p board.complete?
-  board.board.each do |row|
-    row.each do |tile|
-      next if board.mine?(tile)
-      tile.reveal
-    end
-  end
-  board.render
-  p board.complete?
-  board.flag([0, 1])
-  p "Flags = #{board.flag_count}"
-  board.reveal([0,1])
-  board.render
-  p board.complete?
 end
