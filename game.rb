@@ -74,7 +74,6 @@ class Game
   def set_game_over(coords)
     tile = @board.get_tile(coords)
     @game_over = @board.mine?(tile)
-    tile.reveal if @game_over
   end
 
   def game_won?
