@@ -1,7 +1,7 @@
 # Get player input and validate, e.g. f0,0 r0,1
 # Player can flag (f) or reveal(r), coords must be on board
 class Player
-  ACTIONS = 'fr'
+  ACTIONS = 'fr'.freeze
 
   def initialize(board_size)
     rows, cols = board_size
