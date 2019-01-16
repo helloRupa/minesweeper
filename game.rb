@@ -35,13 +35,11 @@ class Game
   end
 
   def self.saved_game?
-    input = self.yn_answer(self.load_msg)
+    input = self.yn_answer do 
+      puts 'Would you like to load a saved game? (Y/N)'
+      print '> '
+    end
     input == 'y'
-  end
-
-  def self.load_msg
-    puts 'Would you like to load a saved game? (Y/N)'
-    print '> '
   end
 
   def initialize
@@ -162,16 +160,11 @@ class Game
     false
   end
 
-  def save_msg
-    puts 'Would you like to save your game? (Y/N)'
-    print '> '
-  end
-
-  def self.yn_answer(msg)
-    msg
+  def self.yn_answer(&msg)
+    msg.call
     input = gets.chomp.downcase
     until 'yn'.include?(input) && !input.empty?
-      msg
+      msg.call
       input = gets.chomp.downcase
     end
     input
@@ -194,7 +187,10 @@ class Game
   end
 
   def save_game
-    input = Game.yn_answer(save_msg)
+    input = Game.yn_answer do
+      puts 'Would you like to save your game? (Y/N)'
+      print '> '
+    end
     if input == 'y'
       filename = Game.get_filename
       File.open("#{filename}.yml", 'w') { |file| file.write(self.to_yaml) }
