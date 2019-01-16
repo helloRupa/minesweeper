@@ -27,6 +27,8 @@ class Board
 
   SEARCH_AREA = [[-1, -1], [-1,0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]].freeze
 
+  attr_reader :board
+
   def initialize(mode)
     @mines = num_mines(mode)
     @rows, @cols = board_size(mode)
@@ -86,7 +88,7 @@ class Board
       y = rand(@rows)
       next if exclude_coords == [y, x] || !@board[y][x].nil?
       make_tile([y, x], 'mine')
-      @board[y][x].reveal
+      # @board[y][x].reveal
       mine_number -= 1
     end
   end
@@ -127,7 +129,7 @@ class Board
         coords = [y, x]
         mine_count = count_mines(coords)
         make_tile(coords, mine_count)
-        @board[y][x].reveal
+        # @board[y][x].reveal
       end
     end
   end
@@ -136,6 +138,26 @@ class Board
     make_mines(exclude_coords)
     make_spaces
   end
+
+  def reveal(coords)
+    y, x = coords
+    @board[y][x].reveal
+  end
+
+  def flag(coords)
+    y, x = coords
+    @board[y][x].flag
+  end
+
+  def complete?
+    @board.each do |row|
+      row.each do |tile|
+        next if mine?(tile)
+        return false unless tile.revealed
+      end
+    end
+    true
+  end
 end
 
 if $PROGRAM_NAME == __FILE__
@@ -143,4 +165,20 @@ if $PROGRAM_NAME == __FILE__
   # board.make_mines([1, 1])
   board.populate([1, 1])
   board.render
+  board.reveal([0, 0])
+  board.flag([0,1])
+  board.render
+  p board.complete?
+  board.board.each do |row|
+    row.each do |tile|
+      next if board.mine?(tile)
+      tile.reveal
+    end
+  end
+  board.render
+  p board.complete?
+  board.flag([0, 1])
+  board.reveal([0,1])
+  board.render
+  p board.complete?
 end
