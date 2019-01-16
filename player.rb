@@ -11,12 +11,12 @@ class Player
 
   def get_input
     input = format_input(gets.chomp)
-    until valid_input?(input)
+    until valid_input?(input) || input == 'quit'
       puts "Please provide a valid action (#{ACTIONS}) and coordinates, e.g. r0,0 or f1,4"
       print '> '
       input = format_input(gets.chomp)
     end
-    input_to_array(input)
+    input == 'quit' ? 'quit' : input_to_array(input)
   end
 
   private
