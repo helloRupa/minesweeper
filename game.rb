@@ -45,7 +45,13 @@ class Game
     @player = Player.new(board_size)
   end
 
+  def clear_screen(secs)
+    sleep(secs)
+    system('clear')
+  end
+
   def welcome_message
+    clear_screen(0)
     puts 'Welcome to Minesweeper!'
     puts
     puts "The goal is to reveal all spaces that aren't mines. If you select a mine, it's game over!"
@@ -56,6 +62,7 @@ class Game
     puts
     puts 'Good luck! Bonne chance!'
     puts
+    clear_screen(10)
   end
 
   def get_mode
@@ -103,6 +110,7 @@ class Game
   end
 
   def turn
+    clear_screen(0)
     render
     turn_msg
     input = @player.get_input
