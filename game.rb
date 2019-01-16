@@ -23,14 +23,16 @@ class Game
 
   def self.minesweeper
     self.welcome_message
-    game = self.saved_game? ? self.load_game(self.get_filename) : new
+    game = self.saved_game? ? self.load_game : new
     should_save = game.run
     exit(true) unless should_save
     game.save_game
     puts 'Goodbye.'
   end
 
-  def self.load_game(filename)
+  def self.load_game
+    filename = self.get_filename
+    filename = self.get_filename until File.file?(filename)
     YAML.load(File.read(filename))
   end
 
