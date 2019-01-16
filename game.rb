@@ -99,6 +99,7 @@ class Game
   end
 
   def render
+    Game.clear_screen(0)
     puts "Mines: #{@mines - @board.flag_count}"
     puts
     @board.render
@@ -119,25 +120,23 @@ class Game
     print '> '
   end
 
+  def make_move(input)
+    action, coords = input
+    @board.populate(coords) if @is_first
+    if action == 'r'
+      @board.reveal(coords)
+      set_game_over(coords) unless flagged?(coords)
+    else
+      @board.flag(coords)
+    end
+  end
+
   def turn
-    Game.clear_screen(0)
     render
     turn_msg
     input = @player.get_input
-
-    if input == 'quit'
-      return true
-    else
-      puts @is_first
-      action, coords = input
-      @board.populate(coords) if @is_first
-      if action == 'r'
-        @board.reveal(coords)
-        set_game_over(coords) unless flagged?(coords)
-      else
-        @board.flag(coords)
-      end
-    end
+    return true if input == 'quit'
+    make_move(input)
     false
   end
 
@@ -158,7 +157,6 @@ class Game
     @is_first = false
     exit_code = turn until @game_over || game_won? || exit_code
     return true if exit_code
-    Game.clear_screen(0)
     render
     @game_over ? game_over_msg : win_msg
     false
