@@ -19,9 +19,22 @@ class Game
   }.freeze
 
   def initialize
+    welcome_message
     mode = get_mode
     @board = Board.new(num_mines(mode), board_size(mode))
-    p @board.board
+  end
+
+  def welcome_message
+    puts 'Welcome to Minesweeper!'
+    puts
+    puts "The goal is to reveal all spaces that aren't mines. If you select a mine, it's game over!"
+    puts
+    puts "To play, choose an action: reveal (r) or flag (f) followed by the coordinates for a space (e.g. r0,0)." 
+    puts "Reveal shows the space's value, while flag places a flag on it, meaning you think there's a mine."
+    puts "You can't reveal a space that's flagged. You must unflag it first using the flag action."
+    puts
+    puts "Good luck! Bonne chance!"
+    puts
   end
 
   def get_mode
