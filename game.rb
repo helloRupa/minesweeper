@@ -74,6 +74,7 @@ class Game
   def set_game_over(coords)
     tile = @board.get_tile(coords)
     @game_over = @board.mine?(tile)
+    tile.reveal if @game_over
   end
 
   def game_won?
@@ -90,8 +91,16 @@ class Game
     turn_msg
     action, coords = @player.get_input
     @board.populate(coords) if is_first
-    action == 'r' ? @board.reveal(coords) : @board.flag(coords)
-    set_game_over(coords)
+    if action == 'r'
+      @board.reveal(coords)
+      set_game_over(coords) unless flagged?(coords)
+    else
+      @board.flag(coords)
+    end
+  end
+
+  def flagged?(coords)
+    @board.flagged?(coords)
   end
 
   def game_over_msg
@@ -105,6 +114,7 @@ class Game
   def run
     turn(true)
     turn(false) until @game_over || game_won?
+    render
     @game_over ? game_over_msg : win_msg
   end
 end
