@@ -22,7 +22,8 @@ class Game
   private_class_method :new
 
   def self.minesweeper
-    game = new
+    self.welcome_message
+    game = self.saved_game? ? self.load_game(self.get_filename) : new
     exit_code = game.run
     exit(true) unless exit_code
     game.save_game
@@ -30,12 +31,21 @@ class Game
   end
 
   def self.load_game(filename)
-    game = YAML.load(File.read(filename))
-    game.run
+    YAML.load(File.read(filename))
+  end
+
+  def self.saved_game?
+    input = self.yn_answer(self.load_msg)
+    input == 'y'
+  end
+
+  def self.load_msg
+    puts 'Would you like to load a saved game? (Y/N)'
+    print '> '
   end
 
   def initialize
-    welcome_message
+    # welcome_message
     @is_first = true
     @game_over = false
     mode = get_mode
@@ -45,13 +55,13 @@ class Game
     @player = Player.new(board_size)
   end
 
-  def clear_screen(secs)
+  def self.clear_screen(secs)
     sleep(secs)
     system('clear')
   end
 
-  def welcome_message
-    clear_screen(0)
+  def self.welcome_message
+    self.clear_screen(0)
     puts 'Welcome to Minesweeper!'
     puts
     puts "The goal is to reveal all spaces that aren't mines. If you select a mine, it's game over!"
@@ -62,7 +72,7 @@ class Game
     puts
     puts 'Good luck! Bonne chance!'
     puts
-    clear_screen(10)
+    self.clear_screen(10)
   end
 
   def get_mode
@@ -76,6 +86,7 @@ class Game
   end
 
   def mode_msg
+    puts
     puts 'Please choose a difficulty: easy, medium or hard:'
     print '> '
   end
@@ -110,7 +121,7 @@ class Game
   end
 
   def turn
-    clear_screen(0)
+    Game.clear_screen(0)
     render
     turn_msg
     input = @player.get_input
@@ -148,6 +159,7 @@ class Game
     @is_first = false
     exit_code = turn until @game_over || game_won? || exit_code
     return true if exit_code
+    Game.clear_screen(0)
     render
     @game_over ? game_over_msg : win_msg
     false
@@ -158,36 +170,37 @@ class Game
     print '> '
   end
 
-  def get_save_answer
-    save_msg
+  def self.yn_answer(msg)
+    msg
     input = gets.chomp.downcase
     until 'yn'.include?(input) && !input.empty?
-      save_msg
+      msg
       input = gets.chomp.downcase
     end
     input
   end
 
-  def filename_msg
+  def self.filename_msg
+    puts
     puts 'Please enter a filename:'
     print '> '
   end
 
-  def get_filename
-    filename_msg
+  def self.get_filename
+    self.filename_msg
     filename = gets.chomp
     while filename.empty?
-      filename_msg
+      self.filename_msg
       filename = gets.chomp
     end
     filename
   end
 
   def save_game
-    input = get_save_answer
+    input = Game.yn_answer(save_msg)
     if input == 'y'
-      filename = get_filename
-      File.open("#{filename}.yml", "w") { |file| file.write(self.to_yaml) }
+      filename = Game.get_filename
+      File.open("#{filename}.yml", 'w') { |file| file.write(self.to_yaml) }
       puts 'File saved.'
     end
   end
