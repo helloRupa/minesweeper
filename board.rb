@@ -34,6 +34,11 @@ class Board
     @board[y][x].flag
   end
 
+  def flagged?(coords)
+    tile = get_tile(coords)
+    tile.flagged
+  end
+
   def complete?
     @board.each do |row|
       row.each do |tile|
