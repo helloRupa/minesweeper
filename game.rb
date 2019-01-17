@@ -55,8 +55,8 @@ class Game
     @is_first = true
     @game_over = false
     @mode = get_mode
-    @mines = num_mines(@mode)
-    board_size = board_size(@mode)
+    @mines = num_mines
+    board_size = board_dims
     @board = Board.new(@mines, board_size)
     @player = Player.new(board_size)
   end
@@ -83,12 +83,12 @@ class Game
 
   def get_mode
     mode_msg
-    mode = gets.chomp.downcase
-    until MODES.key?(mode)
+    input = gets.chomp.downcase
+    until MODES.key?(input)
       mode_msg
-      mode = gets.chomp.downcase
+      input = gets.chomp.downcase
     end
-    mode
+    input
   end
 
   def mode_msg
@@ -97,12 +97,12 @@ class Game
     print '> '
   end
 
-  def num_mines(mode)
-    MODES[mode][:mines]
+  def num_mines
+    MODES[@mode][:mines]
   end
 
-  def board_size(mode)
-    MODES[mode][:size]
+  def board_dims
+    MODES[@mode][:size]
   end
 
   def render
