@@ -2,6 +2,7 @@
 require 'yaml'
 require_relative './player.rb'
 require_relative './board.rb'
+require_relative './save.rb'
 
 class Game
   MODES = {
@@ -19,29 +20,18 @@ class Game
     }
   }.freeze
 
+  WELCOME_WAIT = 3
+
   private_class_method :new
 
   def self.minesweeper
     self.welcome_message
-    game = self.saved_game? ? self.load_game : new
+    game = Save.saved_game? ? Save.load_game : new
     should_save = game.run
     exit(true) unless should_save
-    game.save_game
+    Save.save_game(game)
+    puts
     puts 'Goodbye.'
-  end
-
-  def self.load_game
-    filename = self.get_filename
-    filename = self.get_filename until File.file?(filename)
-    YAML.load(File.read(filename))
-  end
-
-  def self.saved_game?
-    input = self.yn_answer do 
-      puts 'Would you like to load a saved game? (Y/N)'
-      print '> '
-    end
-    input == 'y'
   end
 
   def initialize
@@ -54,13 +44,13 @@ class Game
     @player = Player.new(board_size)
   end
 
-  def self.clear_screen(secs)
+  def self.clear_screen(secs = 0)
     sleep(secs)
     system('clear')
   end
 
   def self.welcome_message
-    self.clear_screen(0)
+    self.clear_screen
     puts 'Welcome to Minesweeper!'
     puts
     puts "The goal is to reveal all spaces that aren't mines. If you select a mine, it's game over!"
@@ -71,7 +61,7 @@ class Game
     puts
     puts 'Good luck! Bonne chance!'
     puts
-    self.clear_screen(10)
+    self.clear_screen(WELCOME_WAIT)
   end
 
   def get_mode
@@ -99,7 +89,7 @@ class Game
   end
 
   def render
-    Game.clear_screen(0)
+    Game.clear_screen
     puts "Mines: #{@mines - @board.flag_count}"
     puts
     @board.render
@@ -161,47 +151,8 @@ class Game
     @game_over ? game_over_msg : win_msg
     false
   end
-
-  def self.yn_answer(&msg)
-    msg.call
-    input = gets.chomp.downcase
-    until 'yn'.include?(input) && !input.empty?
-      msg.call
-      input = gets.chomp.downcase
-    end
-    input
-  end
-
-  def self.filename_msg
-    puts
-    puts 'Please enter a filename:'
-    print '> '
-  end
-
-  def self.get_filename
-    self.filename_msg
-    filename = gets.chomp
-    while filename.empty?
-      self.filename_msg
-      filename = gets.chomp
-    end
-    filename
-  end
-
-  def save_game
-    input = Game.yn_answer do
-      puts 'Would you like to save your game? (Y/N)'
-      print '> '
-    end
-    if input == 'y'
-      filename = Game.get_filename
-      File.open("#{filename}.yml", 'w') { |file| file.write(self.to_yaml) }
-      puts 'File saved.'
-    end
-  end
 end
 
 if $PROGRAM_NAME == __FILE__
   Game.minesweeper
-  # Game.load_game('testing.yml')
 end
