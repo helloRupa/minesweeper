@@ -4,13 +4,29 @@ require 'colorize'
 
 class Leaderboard
   LEVELS = ['easy', 'medium', 'hard']
+  JUSTIFY = 35
+  MAX_NAME_LENGTH = 20
 
   def self.start_timer
     @@time = Time.now
   end
 
+  def self.update_and_print(level)
+    time = self.stop_time
+    self.completion_time_msg(time)
+    self.update_board(level, time)
+    self.print_leaders
+  end
+
   def self.stop_time
     (Time.now - @@time).round(3)
+  end
+
+  def self.completion_time_msg(time)
+    puts
+    puts "You completed the game in #{time} seconds."
+    puts 'See how you did on the leaderboard.'
+    puts
   end
 
   def self.update_board(level, time)
@@ -76,24 +92,34 @@ class Leaderboard
     puts 'No leaders yet.' if l_arr.empty?
     l_arr.each_with_index do |score_arr, idx|
       name, time = score_arr
-      justify = 20 - name.length
-      puts "#{idx + 1}. #{name}: #{time.to_s.rjust(justify)}"
+      name = self.truncate_name(name)
+      justify = JUSTIFY - name.length
+      justify -= 1 if idx > 8
+      puts "#{idx + 1}. #{name} #{time.to_s.rjust(justify)}"
     end
+  end
+
+  def self.truncate_name(name)
+    return name if name.length < MAX_NAME_LENGTH
+    "#{name[0...MAX_NAME_LENGTH]}..."
   end
 end
 
 if $PROGRAM_NAME == __FILE__
-  Leaderboard.print_leaders
   Leaderboard.start_timer
+  sleep(5)
+  Leaderboard.update_and_print('easy')
+  # Leaderboard.print_leaders
+  # Leaderboard.start_timer
 
-  input = nil
-  until input == 'y'
-    print '> '
-    input = gets.chomp
-  end
-  p Leaderboard.stop_time
-  Leaderboard.update_board('easy', 10)
-  Leaderboard.update_board('easy', 5)
-  Leaderboard.update_board('easy', 15)
-  Leaderboard.update_board('easy', 1)
+  # input = nil
+  # until input == 'y'
+  #   print '> '
+  #   input = gets.chomp
+  # end
+  # p Leaderboard.stop_time
+  # Leaderboard.update_board('easy', 10)
+  # Leaderboard.update_board('easy', 5)
+  # Leaderboard.update_board('easy', 15)
+  # Leaderboard.update_board('easy', 1)
 end
