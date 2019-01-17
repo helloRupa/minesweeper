@@ -28,22 +28,18 @@ class Game
 
   def self.minesweeper
     self.welcome_message
-    game = nil
-    loaded_game = false
-    if Save.saved_game?
-      game = Save.load_game
-      loaded_game = true
-    else
-      game = new
-    end
-
-    # game = Save.saved_game? ? Save.load_game : new
+    game, loaded_game = self.type_of_game
     Leaderboard.start_timer unless loaded_game
     should_save = game.run
     Leaderboard.update_and_print(game.mode) if game.won? && !loaded_game
     exit(true) unless should_save
     Save.save_game(game) unless game.is_first
     self.goodbye_msg
+  end
+
+  def self.type_of_game
+    return [Save.load_game, true] if Save.saved_game?
+    [new, false]
   end
 
   def self.goodbye_msg
