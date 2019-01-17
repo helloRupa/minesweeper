@@ -31,7 +31,8 @@ class Game
     game, loaded_game = self.type_of_game
     Leaderboard.start_timer unless loaded_game
     should_save = game.run
-    Leaderboard.update_and_print(game.mode) if game.won? && !loaded_game
+    game.won? && !loaded_game ? Leaderboard.update_and_print(game.mode) : 
+                                Leaderboard.print_leaders
     exit(true) unless should_save
     Save.save_game(game) unless game.is_first
     self.goodbye_msg
