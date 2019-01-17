@@ -22,6 +22,7 @@ class Game
 
   WELCOME_WAIT = 3
 
+  attr_reader :is_first
   private_class_method :new
 
   def self.minesweeper
@@ -29,7 +30,7 @@ class Game
     game = Save.saved_game? ? Save.load_game : new
     should_save = game.run
     exit(true) unless should_save
-    Save.save_game(game)
+    Save.save_game(game) unless game.is_first
     self.goodbye_msg
   end
 
@@ -131,6 +132,7 @@ class Game
     input = @player.get_input
     return true if input == 'quit'
     make_move(input)
+    @is_first = false
     false
   end
 
@@ -148,8 +150,7 @@ class Game
 
   def run
     exit_code = turn
-    @is_first = false
-    exit_code = turn until @game_over || game_won? || exit_code
+    exit_code = turn until exit_code || @game_over || game_won?
     return true if exit_code
     render
     @game_over ? game_over_msg : win_msg
