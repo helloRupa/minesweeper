@@ -3,6 +3,7 @@ require 'yaml'
 require_relative './player.rb'
 require_relative './board.rb'
 require_relative './save.rb'
+require_relative './leaderboard.rb'
 
 class Game
   MODES = {
@@ -22,13 +23,24 @@ class Game
 
   WELCOME_WAIT = 3
 
-  attr_reader :is_first
+  attr_reader :is_first, :mode
   private_class_method :new
 
   def self.minesweeper
     self.welcome_message
-    game = Save.saved_game? ? Save.load_game : new
+    game = nil
+    loaded_game = false
+    if Save.saved_game?
+      game = Save.load_game
+      loaded_game = true
+    else
+      game = new
+    end
+
+    # game = Save.saved_game? ? Save.load_game : new
+    Leaderboard.start_timer unless loaded_game
     should_save = game.run
+    Leaderboard.update_and_print(game.mode) if game.won? && !loaded_game
     exit(true) unless should_save
     Save.save_game(game) unless game.is_first
     self.goodbye_msg
@@ -42,9 +54,9 @@ class Game
   def initialize
     @is_first = true
     @game_over = false
-    mode = get_mode
-    @mines = num_mines(mode)
-    board_size = board_size(mode)
+    @mode = get_mode
+    @mines = num_mines(@mode)
+    board_size = board_size(@mode)
     @board = Board.new(@mines, board_size)
     @player = Player.new(board_size)
   end
@@ -106,7 +118,7 @@ class Game
     @game_over = @board.mine?(tile)
   end
 
-  def game_won?
+  def won?
     @board.complete?
   end
 
@@ -150,7 +162,7 @@ class Game
 
   def run
     exit_code = turn
-    exit_code = turn until exit_code || @game_over || game_won?
+    exit_code = turn until exit_code || @game_over || won?
     return true if exit_code
     render
     @game_over ? game_over_msg : win_msg
