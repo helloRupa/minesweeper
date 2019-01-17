@@ -1,5 +1,6 @@
 # Time games, save leaderboard to text, print leaderboard
 require 'yaml'
+require 'colorize'
 
 class Leaderboard
   LEVELS = ['easy', 'medium', 'hard']
@@ -59,9 +60,30 @@ class Leaderboard
     LEVELS.each { |level| leaders[level] = [] }
     self.save_leaderboard(leaders)
   end
+
+  def self.print_leaders
+    leaders = YAML.load(File.read('leaderboard.yml'))
+    puts
+    puts 'Leaderboard:'.colorize(:yellow)
+    leaders.each do |level, l_arr|
+      puts level.upcase.colorize(:green)
+      self.print_names_and_times(l_arr)
+      puts
+    end
+  end
+
+  def self.print_names_and_times(l_arr)
+    puts 'No leaders yet.' if l_arr.empty?
+    l_arr.each_with_index do |score_arr, idx|
+      name, time = score_arr
+      justify = 20 - name.length
+      puts "#{idx + 1}. #{name}: #{time.to_s.rjust(justify)}"
+    end
+  end
 end
 
 if $PROGRAM_NAME == __FILE__
+  Leaderboard.print_leaders
   Leaderboard.start_timer
 
   input = nil
