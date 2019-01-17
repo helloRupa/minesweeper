@@ -3,12 +3,16 @@ require 'yaml'
 require 'colorize'
 
 class Leaderboard
-  LEVELS = ['easy', 'medium', 'hard']
+  @@levels = ['easy', 'medium', 'hard']
   JUSTIFY = 35
   MAX_NAME_LENGTH = 20
 
   def self.start_timer
     @@time = Time.now
+  end
+
+  def self.set_levels(levels_arr)
+    @@levels = levels_arr
   end
 
   def self.update_and_print(level)
@@ -73,7 +77,7 @@ class Leaderboard
 
   def self.make_blank_leaderboard
     leaders = {}
-    LEVELS.each { |level| leaders[level] = [] }
+    @@levels.each { |level| leaders[level] = [] }
     self.save_leaderboard(leaders)
   end
 
