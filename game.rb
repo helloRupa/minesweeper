@@ -30,6 +30,10 @@ class Game
     should_save = game.run
     exit(true) unless should_save
     Save.save_game(game)
+    goodbye_msg
+  end
+
+  def goodbye_msg
     puts
     puts 'Goodbye.'
   end
