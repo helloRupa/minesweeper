@@ -1,6 +1,7 @@
 # Populate board w/ numerical, bomb, etc tiles and render
 # On init, creates empty board, after first click game should populate
 require './tile.rb'
+require 'colorize'
 
 class Board
   SPACES = {
@@ -11,6 +12,9 @@ class Board
   }.freeze
 
   SEARCH_AREA = [[-1, -1], [-1,0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]].freeze
+
+  COLORS = { '1' => :blue, '2' => :light_blue, '3' => :green, '4' => :light_green, '5' => :magenta, 
+             '6' => :light_magenta, '7' => :cyan, '8' => :light_black, 'F' => :yellow, 'M' => :red }.freeze
 
   attr_reader :board
 
@@ -101,8 +105,15 @@ class Board
   def print_rows
     @board.each_with_index do |row, idx|
       print "#{idx} "
-      puts row_to_string(row)
+      print_color_row(row_to_string(row))
     end
+  end
+
+  def print_color_row(string)
+    string.chars do |char|
+      print COLORS.key?(char) ? char.colorize(COLORS[char]) : char
+    end
+    puts
   end
 
   def make_mines(exclude_coords)
