@@ -95,20 +95,29 @@ class Leaderboard
       name = self.truncate_name(name)
       justify = JUSTIFY - name.length
       justify -= 1 if idx > 8
-      puts "#{idx + 1}. #{name} #{time.to_s.rjust(justify)}"
+      puts "#{idx + 1}. #{name} #{time.to_s.rjust(justify)} secs."
     end
   end
 
   def self.truncate_name(name)
-    return name if name.length < MAX_NAME_LENGTH
-    "#{name[0...MAX_NAME_LENGTH]}..."
+    return name if name.length <= MAX_NAME_LENGTH
+    "#{name[0..MAX_NAME_LENGTH]}..."
   end
 end
 
 if $PROGRAM_NAME == __FILE__
-  Leaderboard.start_timer
-  sleep(5)
-  Leaderboard.update_and_print('easy')
+  # Leaderboard.update_board('easy', 250)
+  # Leaderboard.update_board('easy', 249)
+  # Leaderboard.update_board('medium', 500)
+  # Leaderboard.update_board('medium', 480)
+  # Leaderboard.update_board('medium', 530)
+  # Leaderboard.update_board('hard', 1000)
+  # Leaderboard.update_board('hard', 1200)
+  # Leaderboard.update_board('hard', 999)
+  Leaderboard.print_leaders
+  # Leaderboard.start_timer
+  # sleep(5)
+  # Leaderboard.update_and_print('easy')
   # Leaderboard.print_leaders
   # Leaderboard.start_timer
 
