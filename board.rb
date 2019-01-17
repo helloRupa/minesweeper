@@ -86,8 +86,21 @@ class Board
     arr
   end
 
+  def double_digit_row_header
+    return unless @cols > 9
+    print '   '
+    (0...@cols).each { |num| print num < 10 ? '  ' : "#{num / 10} " }
+    puts
+  end
+
   def print_row_header
-    puts "  #{(0...@rows).to_a.join(' ')}"
+    double_digit_row_header
+    print '   '
+    (0...@cols).each do |num|
+      print num < 10 ? num : num % 10
+      print ' '
+    end
+    puts
   end
 
   def row_to_string(row)
@@ -104,7 +117,7 @@ class Board
 
   def print_rows
     @board.each_with_index do |row, idx|
-      print "#{idx} "
+      print idx > 9 ? "#{idx} " : "#{idx}  "
       print_color_row(row_to_string(row))
     end
   end
